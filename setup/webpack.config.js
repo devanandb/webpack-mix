@@ -9,7 +9,7 @@ var plugins = require('webpack-mix').plugins;
  | Mix Initialization
  |--------------------------------------------------------------------------
  |
- | As our first step, we'll require the project's Laravel Mix file
+ | As our first step, we'll require the project's Webpack Mix file
  | and record the user's requested compilation and build steps.
  | Once those steps have been recorded, we may get to work.
  |
@@ -263,9 +263,9 @@ module.exports.plugins = (module.exports.plugins || []).concat([
 if (Mix.notifications) {
     module.exports.plugins.push(
         new plugins.WebpackNotifierPlugin({
-            title: 'Laravel Mix',
+            title: 'Webpack Mix',
             alwaysNotify: true,
-            contentImage: 'node_modules/laravel-mix/icons/laravel.png'
+            contentImage: 'node_modules/webpack-mix/icons/webpack.png'
         })
     );
 }

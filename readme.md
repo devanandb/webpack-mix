@@ -14,4 +14,4 @@ Webpack Mix is open-sourced software licensed under the [MIT license](http://ope
 
 ## Thanks
 
-This is a copy of [on GitHub](https://github.com/JeffreyWay/laravel-mix) without Laravel and Vue pieces.
+This is a copy of [Laravel Mix](https://github.com/JeffreyWay/laravel-mix) without Laravel and Vue pieces.

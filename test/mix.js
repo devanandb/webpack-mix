@@ -1,0 +1,94 @@
+import test from 'ava';
+import {mix, config as Mix} from '../src/index';
+import path from 'path';
+
+test.afterEach('cleanup', t => {
+    mix.reset();
+});
+
+test('that it throws exception if mix.js() was not called', t => {   
+    const error = t.throws(() => {
+        mix.sass('sass/stub.scss', 'dist');
+        Mix.entry();
+    }, Error);
+
+    t.is(error.message, 'Webpack Mix: You must call "mix.js()" once or more.');
+
+    mix.reset();
+
+    t.notThrows(() => {
+        mix.js('js/stub.js', 'dist');
+        Mix.entry();
+    }, Error);    
+});
+
+test('that it determines the JS paths', t => {
+    mix.js('js/stub.js', 'dist')
+       .js('js/another.js', 'dist');
+
+    let js = mix.config.js;
+    let root = path.resolve(__dirname, '../');
+
+    t.is(path.resolve(root, 'js/stub.js'), js[0].entry[0].path);
+    t.is(path.resolve(root, 'js/another.js'), js[1].entry[0].path);
+    t.is('dist/stub.js', js[0].output.path);
+    t.falsy(js[0].vendor);
+
+    // We can also pass an array of entry scripts, to be bundled together.
+     mix.reset();
+
+     mix.js(['js/stub.js', 'js/another.js'], 'dist/bundle.js');
+     t.is('dist/bundle.js', mix.config.js[0].output.path);
+     t.is(2, mix.config.js[0].entry.length);
+});
+
+
+test('that it determines the CSS output path correctly.', t => {
+    mix.setPublicPath('./public')
+       .js('js/stub.js', 'dist')
+       .sass('sass/stub.scss', 'dist');
+
+    t.is('dist/stub.css', mix.config.cssOutput());
+});
+
+
+test('that it calculates the output correctly', t => {
+    mix.js('js/stub.js', 'dist').sass('sass/stub.scss', 'dist');
+
+    t.deepEqual({
+        path: './public',
+        filename: 'dist/[name].js',
+        publicPath: './'
+    }, mix.config.output());
+
+
+    // Enabling Hot Reloading should change this output.
+    mix.config.hmr = true;
+
+    t.deepEqual({
+        path: '/',
+        filename: 'dist/[name].js',
+        publicPath: 'http://localhost:8080/'
+    }, mix.config.output());
+
+
+    // Extracting vendor libraries should change this output.
+    mix.config.hmr = false;
+    mix.extract(['some-lib']);
+
+    t.deepEqual({
+        path: './public',
+        filename: 'dist/[name].js',
+        publicPath: './'
+    }, mix.config.output());
+
+
+    // Enabling file versioning shoul dchange this output.
+    mix.version();
+
+    t.deepEqual({
+        path: './public',
+        filename: 'dist/[name].[hash].js',
+        publicPath: './'
+    }, mix.config.output());
+});

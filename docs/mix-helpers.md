@@ -1,4 +1,4 @@
-# Laravel Mix Helpers
+# Webpack Mix Helpers
 
 Though you likely won't need to reference many of these helpers directly, they, nonetheless, are available to you, should you wish to manually configure/modify the provided `webpack.config.js` file.
 
@@ -16,7 +16,7 @@ This can be particularly useful for plugins or tasks that are only necessary for
 
 ### `mix.File`
 
-This property contains a reference to Laravel Mix's `File` class, which includes a number of useful helpers. 
+This property contains a reference to Webpack Mix's `File` class, which includes a number of useful helpers. 
 
 ```js
 let file = new mix.File('path/to/file.js');

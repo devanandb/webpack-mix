@@ -29,7 +29,6 @@ Once you run Webpack to compile your code, you'll find three new files. You may 
 
 In effect, we pay a small HTTP request penalty, in exchange for improved long-term caching.
 
-> **Laravel Users:** You alternatively have access to a `mix('js/app.js')` function that will dynamically create these script tag for you.
 
 ### What's That Manifest File?
 

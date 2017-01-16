@@ -3,8 +3,6 @@
 ## Overview
 * [Basic Example](basic-example.md)
 * [Installation](installation.md)
-* [Laravel Workflow](workflow.md)
-* [Laravel Mix vs. Laravel Elixir](laravel-elixir-vs-mix.md)
 * [FAQ](faq.md)
 
 ## API
@@ -19,6 +17,6 @@
 * [Quick Webpack Configuration](quick-webpack-configuration.md)
 
 ## Advanced Configuration
-* [Laravel Mix Helpers](mix-helpers.md)
+* [Webpack Mix Helpers](mix-helpers.md)
 * [The Webpack Configuration File](the-webpack-configuration-file.md)
 

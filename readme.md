@@ -6,7 +6,7 @@ If you've ever been confused about how to get started with module bundling and a
 
 ## Documentation
 
-You may review the initial documentation here [on GitHub](https://github.com/JeffreyWay/laravel-mix/tree/master/docs).
+You may review the initial documentation here [on GitHub](https://github.com/devanandb/webpack-mix/tree/master/docs).
 
 ## License
 

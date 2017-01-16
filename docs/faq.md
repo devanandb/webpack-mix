@@ -1,9 +1,5 @@
 # Frequently Asked Questions
 
-### Does this tool require that I use Laravel?
-
-No. It has a few optimizations for Laravel, but it can be used for any project.
-
 ### My code isn't being minified.
 
 Minification will only be performed, when your `NODE_ENV` is set to production. Not only will this speed up your compilation time, but it's also unnecessary during development. Here's an example of running Webpack for production.
@@ -33,7 +29,3 @@ If you're running `npm run dev` through a VM, you may find that file changes are
     "dev": "NODE_ENV=development webpack --watch --watch-poll",
   }
 ```
-
-### My manifest.json file shouldn't be in the project root.
-
-If you're not using Laravel, your `manifest.json` file will be dumped into the project root. If you need to change this, call `mix.setPublicPath('dist/');`, and your manifest file will now be saved in that base directory.

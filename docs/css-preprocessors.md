@@ -9,7 +9,7 @@ A single method call allows you to compile your Sass \(`mix.sass()`\) or Less \(
 
 > Note: Webpack naturally requires some form of JavaScript compilation. You can't use `mix.sass()` without a call to `mix.js()` as well.
 
-Though Webpack can inline all of your CSS directly into the bundled JavaScript, Laravel Mix automatically performs the necessary steps to extract it to your desired output path.
+Though Webpack can inline all of your CSS directly into the bundled JavaScript, Webpack Mix automatically performs the necessary steps to extract it to your desired output path.
 
 ### Multiple Builds
 
@@ -27,10 +27,10 @@ Let's review a quick example:
 **webpack.mix.js**
 
 ```js
-let mix = require('laravel-mix').mix;
+let mix = require('webpack-mix').mix;
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.sass', 'public/css');
+mix.js('js/app.js', 'public/js')
+   .sass('sass/app.sass', 'public/css');
 ```
 
 **./resources/assets/sass/app.sass**

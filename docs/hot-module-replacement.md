@@ -31,5 +31,5 @@ The key to making hot reloading work within an application is ensuring that all 
 
 ### Usage in SPAs
 
-Webpack Mix includes amny popular loaders package, which means, for SPAs, there's nothing for you to do. It'll all work seamlessly out of the box!
+Webpack Mix includes many popular loaders package, which means, for SPAs, there's nothing for you to do. It'll all work seamlessly out of the box!
 

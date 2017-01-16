@@ -1,6 +1,6 @@
 {
   "name": "webpack-mix",
-  "version": "0.1.2",
+  "version": "1.0.1",
   "description": "Elegant wrapper around Webpack for the 80% use cases.",
   "main": "src/index.js",
   "scripts": {
@@ -52,5 +52,6 @@
   },
   "devDependencies": {
     "ava": "^0.17.0"
-  }
+  },
+  "repository": "devanandb/webpack-mix",
 }

@@ -53,5 +53,5 @@
   "devDependencies": {
     "ava": "^0.17.0"
   },
-  "repository": "devanandb/webpack-mix",
+  "repository": "devanandb/webpack-mix"
 }

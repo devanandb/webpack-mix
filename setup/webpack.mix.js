@@ -14,6 +14,7 @@ let mix = require('webpack-mix').mix;
 mix.js('src/app.js', 'dist/')
    .sass('src/app.scss', 'dist/');
 
+
 // Full API
 // mix.js(src, output);
 // mix.extract(vendorLibs);
@@ -25,5 +26,7 @@ mix.js('src/app.js', 'dist/')
 // mix.sourceMaps(); // Enable sourcemaps
 // mix.version(); // Enable versioning.
 // mix.disableNotifications();
-// mix.setPublicPath('path/to/public'); <-- Useful for Node apps.
+// mix.setPublicPath('path/to/public');
+// mix.autoload({}); <-- Will be passed to Webpack's ProvidePlugin.
 // mix.webpackConfig({}); <-- Override webpack.config.js, without editing the file directly.
+// mix.then(function () {}) <-- Will be triggered each time Webpack finishes building.

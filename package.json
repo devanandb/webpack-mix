@@ -1,6 +1,6 @@
 {
   "name": "webpack-mix",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Elegant wrapper around Webpack for the 80% use cases.",
   "main": "src/index.js",
   "scripts": {
@@ -8,7 +8,8 @@
     "dev": "cross-env NODE_ENV=development webpack --watch --progress --hide-modules",
     "hmr": "cross-env NODE_ENV=development webpack-dev-server --inline --hot",
     "production": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "test": "ava --verbose"
+    "test": "nyc ava --verbose",
+    "posttest": "nyc report --reporter=html"
   },
   "keywords": [
     "webpack config",
@@ -24,7 +25,7 @@
     "babel-loader": "^6.2.9",
     "babel-preset-es2015": "^6.18.0",
     "clean-css": "^3.4.22",
-    "concatenate": "0.0.1",
+    "concatenate": "0.0.2",
     "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^3.1.3",
     "css-loader": "^0.26.1",
@@ -44,14 +45,16 @@
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.1",
     "uglify-js": "^2.7.5",
-    "webpack": "^2.2.0-rc.3",
-    "webpack-dev-server": "^2.2.0-rc.0",
-    "webpack-manifest-plugin": "^1.1.0",
+    "webpack": "^2.2.0",
+    "webpack-dev-server": "^2.2.0",
     "webpack-md5-hash": "0.0.5",
-    "webpack-notifier": "^1.4.1"
+    "webpack-notifier": "^1.4.1",
+    "webpack-stats-plugin": "^0.1.4"
   },
   "devDependencies": {
-    "ava": "^0.17.0"
+    "ava": "^0.17.0",
+    "nyc": "^10.0.0",
+    "sinon": "^1.17.7"
   },
   "repository": "devanandb/webpack-mix"
 }

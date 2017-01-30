@@ -5,9 +5,7 @@ mix.js('src', 'output')
    .sass('src', 'output')
 ```
 
-A single method call allows you to compile your Sass \(`mix.sass()`\) or Less \(`mix.less()`\) files.
-
-> Note: Webpack naturally requires some form of JavaScript compilation. You can't use `mix.sass()` without a call to `mix.js()` as well.
+A single method call allows you to compile your Sass \(`mix.sass()`\) or Less \(`mix.less()`\) files, while applying automatic CSS3 prefixing.
 
 Though Webpack can inline all of your CSS directly into the bundled JavaScript, Webpack Mix automatically performs the necessary steps to extract it to your desired output path.
 
@@ -27,10 +25,10 @@ Let's review a quick example:
 **webpack.mix.js**
 
 ```js
-let mix = require('webpack-mix').mix;
+let mix = require('webpack-mix');
 
-mix.js('js/app.js', 'public/js')
-   .sass('sass/app.sass', 'public/css');
+mix.js('resources/assets/js/app.js', 'public/js')
+   .sass('resources/assets/sass/app.sass', 'public/css');
 ```
 
 **./resources/assets/sass/app.sass**
@@ -53,4 +51,3 @@ Compile this down as usual \(`npm run webpack`\), and you'll find a `./public/cs
 ```
 
 That's all there is to it!
-

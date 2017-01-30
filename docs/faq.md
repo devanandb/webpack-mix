@@ -27,5 +27,30 @@ If you're running `npm run dev` through a VM, you may find that file changes are
 ```js
 "scripts": {
     "dev": "NODE_ENV=development webpack --watch --watch-poll",
-  }
+  }
+```
+
+### How Do I autoload modules with Webpack?
+
+Through its `ProvidePlugin` plugin, Webpack allows you to automatically load modules, where needed. A common use-case for this is when we need to pull in jQuery.
+
+```js
+new webpack.ProvidePlugin({
+  $: 'jquery',
+  jQuery: 'jquery'
+});
+
+// in a module
+$('#item'); // <= just works
+jQuery('#item'); // <= just works
+// $ is automatically set to the exports of module "jquery"
+```
+
+While Webpack Mix automatically loads jQuery for you (exactly as the example above demonstrates), should you need to disable it (by passing an empty object), or override it with your own modules, you may use the `mix.autoload()` method. Here's an example:
+
+```js
+mix.autoload({
+  jquery: ['$', 'window.jQuery', 'jQuery'], // more than one
+  moment: 'moment' // only one
+})
 ```

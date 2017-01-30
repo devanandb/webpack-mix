@@ -1,10 +1,12 @@
 let path = require('path');
-let paths = require('./Paths');
 let File = require('./File');
-let lodash = require('lodash');
+let Paths = require('./Paths');
 let Manifest = require('./Manifest');
 let Versioning = require('./Versioning');
 let concatenate = require('concatenate');
+let mergeWith = require('lodash').mergeWith;
+let WebpackEntry = require('./WebpackEntry');
+let Dispatcher = require('./Dispatcher');
 
 class Mix {
     /**
@@ -12,12 +14,15 @@ class Mix {
      */
     constructor() {
         this.File = File;
-        this.paths = paths;
+        this.Paths = new Paths;
         this.hmr = false;
         this.sourcemaps = false;
         this.notifications = true;
         this.cssPreprocessor = false;
         this.versioning = false;
+        this.js = [];
+        this.webpackEntry = new WebpackEntry(this);
+        this.events = new Dispatcher;
         this.inProduction = process.env.NODE_ENV === 'production';
         this.publicPath = './';
     }
@@ -25,15 +30,21 @@ class Mix {
 
     /**
      * Initialize the user's webpack.mix.js configuration file.
+     *
+     * @param {string} rootPath
      */
-    initialize() {
+    initialize(rootPath = '') {
+
         // We'll first load the user's webpack.mix.js file.
-        require(this.paths.mix());
+        if (rootPath) {
+            this.Paths.setRootPath(rootPath);
+        }
+        require(this.Paths.mix());
+
+        this.manifest = new Manifest(this.publicPath + '/mix-manifest.json');
 
         if (this.versioning) {
-            this.versioning = new Versioning(
-                new Manifest(this.publicPath + '/manifest.json')
-            )
+            this.versioning = new Versioning(this.manifest);
         }
 
         this.detectHotReloading();
@@ -46,45 +57,25 @@ class Mix {
      * @param {object} webpackConfig
      */
     finalize(webpackConfig) {
-        if (! this.webpackConfig) return;
+        if (! this.webpackConfig) return webpackConfig;
 
-        lodash.mergeWith(webpackConfig, this.webpackConfig,
+        mergeWith(webpackConfig, this.webpackConfig,
             (objValue, srcValue) => {
                 if (Array.isArray(objValue)) {
                     return objValue.concat(srcValue);
                 }
             }
         );
+
+        return webpackConfig;
     }
 
 
     /**
-     * Determine the Webpack entry file(s).
+     * Prepare the Webpack entry object.
      */
     entry() {
-        // We'll build up an entry object that the webpack.config.js
-        // file will want to see. It'll include all mix.js() calls.
-
-        if (!this.js) {
-            throw new Error(
-                `Webpack Mix: You must call "mix.js()" once or more.`
-            );
-        }
-
-        let entry = this.js.reduce((result, paths) => {
-            result[paths.output.name] = paths.entry.map(src => src.path);
-
-            return result;
-        }, {});
-
-        if (this.cssPreprocessor) {
-            let stylesheets = this[this.cssPreprocessor].map(entry => entry.src.path);
-            let name = Object.keys(entry)[0];
-
-            entry[name] = entry[name].concat(stylesheets);
-        }
-
-        return entry;
+        return this.webpackEntry.build();
     }
 
 
@@ -92,12 +83,11 @@ class Mix {
      * Determine the Webpack output path.
      */
     output() {
-        // We'll only apply a chunkhash in production, as it's a costly step.
-        let filename = (this.inProduction && this.versioning) ? '[name].[chunkhash].js' : '[name].js';
+        let filename = this.versioning ? '[name].[chunkhash].js' : '[name].js';
 
         return {
             path: this.hmr ? '/' : this.publicPath,
-            filename: path.join(this.js[0].output.base, filename).replace(this.publicPath, ''),
+            filename: filename,
             publicPath: this.hmr ? 'http://localhost:8080/' : './'
         };
     }
@@ -110,9 +100,9 @@ class Mix {
      */
     cssOutput(segments) {
         let regex = new RegExp('^(\.\/)?' + this.publicPath);
-        let path = (this.inProduction && this.versioning) ? 'hashedPath' : 'path';
+        let pathVariant = this.versioning ? 'hashedPath' : 'path';
 
-        return segments.output[path].replace(regex, '');
+        return segments.output[pathVariant].replace(regex, '').replace(/\\/g, '/');
     }
 
 
@@ -154,19 +144,23 @@ class Mix {
 
     /**
      * Detect if the user desires hot reloading.
+     *
+     * @param {bool} force
      */
-    detectHotReloading() {
+    detectHotReloading(force = false) {
         let file = new this.File(this.publicPath + '/hot');
 
         file.delete();
 
         // If the user wants hot module replacement, we'll create
-        // a temporary file, so that webpack can detect it, and
+        // a temporary file, so that app can detect it, and
         // reference the proper base URL for any assets.
-        if (process.argv.includes('--hot')) {
+        if (process.argv.includes('--hot') || force) {
             this.hmr = true;
 
             file.write('hot reloading enabled');
+        } else {
+            this.hmr = false;
         }
     }
 
@@ -175,7 +169,7 @@ class Mix {
      * Fetch the appropriate Babel config for babel-loader.
      */
     babelConfig() {
-        let file = this.paths.root('.babelrc');
+        let file = this.Paths.root('.babelrc');
 
         // If the user has defined their own .babelrc file,
         // the babel-loader will automatically fetch it.
@@ -188,6 +182,23 @@ class Mix {
         });
     }
 
+
+    /**
+     * Reset all configuration to their defaults.
+     */
+    reset() {
+        [
+            'cssPreprocessor', 'sass',
+            'less', 'sourceMaps'
+        ].forEach(prop => this[prop] = null);
+
+        this.publicPath = './';
+        this.js = [];
+        this.webpackEntry.reset();
+
+        return this;
+    }
 };
+
 
 module.exports = new Mix;

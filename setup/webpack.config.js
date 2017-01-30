@@ -29,7 +29,7 @@ Mix.initialize();
  |
  */
 
-module.exports.context = Mix.paths.root();
+module.exports.context = Mix.Paths.root();
 
 
 /*
@@ -45,11 +45,6 @@ module.exports.context = Mix.paths.root();
 
 module.exports.entry = Mix.entry();
 
-if (Mix.js.vendor) {
-    module.exports.entry.vendor = Mix.js.vendor;
-}
-
-
 
 /*
  |--------------------------------------------------------------------------
@@ -63,7 +58,6 @@ if (Mix.js.vendor) {
  */
 
 module.exports.output = Mix.output();
-
 
 
 /*
@@ -110,10 +104,11 @@ module.exports.module = {
         },
 
         {
-            test: /\.(woff2?|ttf|eot|svg)$/,
+            test: /\.(woff2?|ttf|eot|svg|otf)$/,
             loader: 'file-loader',
             options: {
-                name: '/fonts/[name].[ext]?[hash]'
+                name: 'fonts/[name].[ext]?[hash]',
+                publicPath: '/'
             }
         }
     ]
@@ -127,14 +122,14 @@ if (Mix.cssPreprocessor) {
         );
 
         module.exports.module.rules.push({
-            test: new RegExp(toCompile.src.file),
+            test: new RegExp(toCompile.src.fileWithDir.replace(/\\/g, '\\\\') + '$'),
             loader: extractPlugin.extract({
                 fallbackLoader: 'style-loader',
                 loader: [
                     'css-loader',
                     'postcss-loader',
                     'resolve-url-loader',
-                    (Mix.cssPreprocessor == 'sass') ? 'sass-loader?sourceMap' : 'less-loader'
+                    (Mix.cssPreprocessor == 'sass') ? 'sass-loader?sourceMap&precision=8' : 'less-loader'
                 ]
             })
         });
@@ -151,17 +146,12 @@ if (Mix.cssPreprocessor) {
  |--------------------------------------------------------------------------
  |
  | Here, we may set any options/aliases that affect Webpack's resolving
- | of modules. To begin, we will provide the necessary Vue alias to
- | load the Vue common library. You may delete this, if needed.
+ | of modules. 
  |
  */
 
 module.exports.resolve = {
     extensions: ['*', '.js', '.jsx', '.vue'],
-
-    alias: {
-        'vue$': 'vue/dist/vue.common.js'
-    }
 };
 
 
@@ -234,15 +224,19 @@ module.exports.devServer = {
  */
 
 module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.ProvidePlugin({
+    new webpack.ProvidePlugin(Mix.autoload || {
         jQuery: 'jquery',
         $: 'jquery',
-        jquery: 'jquery'
+        jquery: 'jquery',
+        'window.jQuery': 'jquery'
     }),
 
     new plugins.FriendlyErrorsWebpackPlugin(),
 
-    new plugins.ManifestPlugin(),
+    new plugins.StatsWriterPlugin({
+        filename: "mix-manifest.json",
+        transform: Mix.manifest.transform,
+    }),
 
     new plugins.WebpackMd5HashPlugin(),
 
@@ -265,10 +259,17 @@ if (Mix.notifications) {
         new plugins.WebpackNotifierPlugin({
             title: 'Webpack Mix',
             alwaysNotify: true,
-            contentImage: 'node_modules/webpack-mix/icons/webpack.png'
+            contentImage: Mix.Paths.root('node_modules/webpack-mix/icons/webpack.png')
         })
     );
 }
+
+
+module.exports.plugins.push(
+    new plugins.WebpackOnBuildPlugin(
+        stats => Mix.events.fire('build', stats)
+    )
+);
 
 
 if (Mix.versioning) {
@@ -303,7 +304,8 @@ if (Mix.copy) {
 if (Mix.js.vendor) {
     module.exports.plugins.push(
         new webpack.optimize.CommonsChunkPlugin({
-            names: ['vendor', 'manifest']
+            names: [Mix.js.base + '/vendor', Mix.js.base + '/' + 'manifest'],
+            minChunks: Infinity
         })
     );
 }

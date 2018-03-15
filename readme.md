@@ -1,4 +1,4 @@
-<img align="left" src="https://github.com/devanandb/webpack-mix/blob/update/version-2-0/icons/webpack.png" alt="Webpack Mix">
+<img align="left" src="https://webpack.js.org/6bc5d8cf78d442a984e70195db059b69.svg" alt="Webpack Mix">
 <br>
 <h1 align="left">Webpack Mix</h1>
 <p align="left">

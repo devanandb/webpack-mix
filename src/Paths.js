@@ -1,13 +1,16 @@
-let path = require('path');
+let argv = require('yargs').argv;
 
 class Paths {
     /**
      * Create a new Paths instance.
      */
     constructor() {
-        this.rootPath = path.resolve(__dirname, '../../../');
+        if (argv['$0'].includes('ava')) {
+            this.rootPath = path.resolve(__dirname, '../');
+        } else {
+            this.rootPath = path.resolve(__dirname, '../../../');
+        }
     }
-
 
     /**
      * Set the root path to resolve webpack.mix.js.
@@ -20,19 +23,18 @@ class Paths {
         return this;
     }
 
-
     /**
      * Determine the path to the user's webpack.mix.js file.
      */
     mix() {
-        return this.root('webpack.mix');
+        return this.root(
+            argv.env && argv.env.mixfile ? argv.env.mixfile : 'webpack.mix'
+        );
     }
-
 
     /**
      * Determine the project root.
      *
-     * @param {string|null} rootPath
      * @param {string|null} append
      */
     root(append = '') {

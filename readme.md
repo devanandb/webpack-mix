@@ -1,3 +1,9 @@
+<p align="center">
+<a href="https://www.npmjs.com/package/webpack-mix"><img src="https://img.shields.io/npm/v/webpack-mix.svg" alt="NPM"></a>
+<a href="https://npmcharts.com/compare/webpack-mix?minimal=true"><img src="https://img.shields.io/npm/dt/webpack-mix.svg" alt="NPM"></a>
+<a href="https://www.npmjs.com/package/webpack-mix"><img src="https://img.shields.io/npm/l/webpack-mix.svg" alt="NPM"></a>
+</p>
+
 ## Introduction
 
 Webpack Mix provides a clean, fluent API for defining basic Webpack build steps for your application. Mix supports several common CSS and JavaScript pre-processors.

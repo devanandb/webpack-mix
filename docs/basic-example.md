@@ -1,6 +1,6 @@
 # Basic Example
 
-webpack Mix is a clean layer on top of Webpack to make the 80% use case laughably simple to execute. Most would agree that, though incredibly powerful, Webpack ships with a steep learning curve. But what if you didn't have to worry about that?
+Webpack Mix is a clean layer on top of Webpack to make the 80% use case laughably simple to execute. Most would agree that, though incredibly powerful, Webpack ships with a steep learning curve. But what if you didn't have to worry about that?
 
 Have a look at a basic `webpack.mix.js` file. Let's imagine that we only desire JavaScript \(ES2015 with modules\), and Sass compilation:
 
@@ -18,7 +18,7 @@ Done. Simple, right?
 
 With this configuration in place, we may trigger Webpack from the command line: `node_modules/.bin/webpack`.
 
-During development, it's unnecessary to minify the output, however, this will be performed automatically when you trigger Webpack within a production environment: `export NODE_ENV=production && webpack`.
+During development, it's unnecessary to minify the output, however, this will be performed automatically when you trigger Webpack within a production environment: `export NODE_ENV=production webpack`.
 
 ### Less?
 

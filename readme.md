@@ -1,10 +1,14 @@
 <img align="left" src="https://github.com/devanandb/webpack-mix/blob/update/version-2-0/icons/webpack.png" alt="Webpack Mix">
-#Webpack Mix
-<p align="center">
+<br>
+<h1 align="left">Webpack Mix</h1>
+<p align="left">
 <a href="https://www.npmjs.com/package/webpack-mix"><img src="https://img.shields.io/npm/v/webpack-mix.svg" alt="NPM"></a>
 <a href="https://npmcharts.com/compare/webpack-mix?minimal=true"><img src="https://img.shields.io/npm/dt/webpack-mix.svg" alt="NPM"></a>
 <a href="https://www.npmjs.com/package/webpack-mix"><img src="https://img.shields.io/npm/l/webpack-mix.svg" alt="NPM"></a>
 </p>
+
+<br>
+<br>
 
 ## Introduction
 

@@ -4,6 +4,7 @@
 * [Basic Example](basic-example.md)
 * [Installation](installation.md)
 * [FAQ](faq.md)
+* [Troubleshooting](troubleshooting.md)
 
 ## API
 * [JavaScript](mixjs.md)
@@ -14,9 +15,16 @@
 * [Copying Files](copying-files.md)
 * [OS Notifications](os-notifications.md)
 * [Concatenation and Minification](concatenation-and-minification.md)
-* [Quick Webpack Configuration](quick-webpack-configuration.md)
+* [Autoloading](autoloading.md)
+* [Event Hooks](event-hooks.md)
+* [Quick webpack Configuration](quick-webpack-configuration.md)
+* [Extending Mix](extending-mix.md)
+
+## Custom Recipes
+
+* [LiveReload](livereload.md)
+* [jQuery UI](jquery-ui.md)
 
 ## Advanced Configuration
-* [Webpack Mix Helpers](mix-helpers.md)
-* [The Webpack Configuration File](the-webpack-configuration-file.md)
+* [Webpack Mix Options](options.md)
 

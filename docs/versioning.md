@@ -25,7 +25,14 @@ As an example, try running`webpack --watch`, and then change a bit of your JavaS
 
 This all begs the question: how exactly do we include these versioned scripts and stylesheets into your HTML, if the names keep changing? Yes, that can be tricky. The answer will be dependent upon the type of application you're building. For SPAs, you may dynamically read Webpack Mix's generated `manifest.json` file, extract the asset file names \(these will be updated for each compile to reflect the new versioned file\), and then generate your HTML.
 
-#### Note
 
-Versioning is only performed when running in `production` mode.  (ie with `NODE_ENV=production`)
+### Versioning Extra Files
+
+The `mix.version()` will automatically version any compiled JavaScript, Sass/Less, or combined files. However, if you'd also like to version extra files as part of your build, simply pass a path, or array of paths, to the method, like so:
+
+```js
+mix.version(['public/js/random.js']);
+```
+
+Now, we'll still version any relevant compiled files, but we'll also append a query string, `public/js/random.js?{hash}`, and update your `mix-manifest.json` file.
 

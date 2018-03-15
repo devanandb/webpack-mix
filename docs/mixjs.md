@@ -6,11 +6,12 @@ mix.js(src|[src], output)
 
 With a single line of code, Webpack Mix allows you to trigger a number of vital actions.
 
-* ES2015 + modules compilation
+* ES2017 + modules compilation
+* Build and compile `.vue` components \(via `vue-loader`\)
 * Hot module replacement
-* Tree-shaking, new in Webpack 2 \(removes unused library code\)
+* Tree-shaking, new in webpack 2 \(removes unused library code\)
 * Extract vendor libraries \(via `mix.extract()`\), for improved long-term caching
-* Automatic versioning \(file hashing\), via `mix.vendor()`
+* Automatic versioning \(query string hash\), via `mix.version()`
 
 
 ### Usage
@@ -34,3 +35,14 @@ mix.js([
 mix.js('src/app.js', 'dist/')
    .js('src/forum.js', 'dist/');
 ```
+
+
+### React Support
+
+Laravel Mix also ships with basic React support. Simply update your `mix.js()` call to `mix.react()`, and then use the exact same set of arguments. Behind the scenes, Mix will pull in and reference any necessary Babel plugins for React.
+
+```js
+mix.react('resources/assets/js/app.jsx', 'public/js/app.js');
+```
+
+Of course, you'll still want to install React and ReactDOM through NPM, per usual, but everything else should be taken care of.

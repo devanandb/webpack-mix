@@ -6,6 +6,7 @@
 <a href="https://npmcharts.com/compare/webpack-mix?minimal=true"><img src="https://img.shields.io/npm/dt/webpack-mix.svg" alt="NPM"></a>
 <a href="https://www.npmjs.com/package/webpack-mix"><img src="https://img.shields.io/npm/l/webpack-mix.svg" alt="NPM"></a>
 <a href="https://www.npmjs.com/package/webpack-mix"><img src="http://inch-ci.org/github/devanandb/webpack-mix.svg?branch=master"></a>
+<a href="http://hits.dwyl.io/devanandb/webpack-mix"><img src="http://hits.dwyl.io/devanandb/webpack-mix.svg" alt="HitCount"></a>
 </p>
 
 <br>

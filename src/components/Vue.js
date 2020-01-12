@@ -1,13 +1,19 @@
+let { VueLoaderPlugin } = require('vue-loader');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
+let collect = require('collect.js');
 
 class Vue {
     /**
      * Required dependencies for the component.
      */
     dependencies() {
+        let dependencies = ['vue-template-compiler'];
+
         if (Config.extractVueStyles && Config.globalVueStyles) {
-            return ['sass-resources-loader']; // Required for importing global styles into every component.
+            dependencies.push('sass-resources-loader');
         }
+
+        return dependencies;
     }
 
     /**
@@ -15,121 +21,161 @@ class Vue {
      *
      * @param {Object} webpackConfig
      */
-    webpackConfig(config) {
-        let { vueLoaderOptions, extractPlugin } = this.vueLoaderOptions();
-
-        config.module.rules.push({
+    webpackConfig(webpackConfig) {
+        webpackConfig.module.rules.push({
             test: /\.vue$/,
-            loader: 'vue-loader',
-            exclude: /bower_components/,
-            options: vueLoaderOptions
+            use: [
+                {
+                    loader: 'vue-loader',
+                    options: Config.vue || {}
+                }
+            ]
         });
 
-        config.plugins.push(extractPlugin);
+        webpackConfig.plugins.push(new VueLoaderPlugin());
+
+        this.updateCssLoaders(webpackConfig);
     }
 
     /**
-     * vue-loader-specific options.
+     * Update all preprocessor loaders to support CSS extraction.
+     *
+     * @param {Object} webpackConfig
      */
-    vueLoaderOptions() {
-        let extractPlugin = this.extractPlugin();
+    updateCssLoaders(webpackConfig) {
+        // Basic CSS and PostCSS
+        this.updateCssLoader('css', webpackConfig, rule => {
+            rule.loaders.find(
+                loader => loader.loader === 'postcss-loader'
+            ).options = this.postCssOptions();
+        });
 
-        if (Config.extractVueStyles) {
-            var sassLoader = extractPlugin.extract({
-                use: 'css-loader!sass-loader?indentedSyntax',
-                fallback: 'vue-style-loader'
-            });
+        // LESS
+        this.updateCssLoader('less', webpackConfig);
 
-            var scssLoader = extractPlugin.extract({
-                use: 'css-loader!sass-loader',
-                fallback: 'vue-style-loader'
-            });
+        // SASS
+        let sassCallback = rule => {
+            if (Mix.seesNpmPackage('sass')) {
+                rule.loaders.find(
+                    loader => loader.loader === 'sass-loader'
+                ).options.implementation = require('sass');
+            }
 
             if (Config.globalVueStyles) {
-                scssLoader.push({
-                    loader: 'sass-resources-loader',
-                    options: {
-                        resources: Mix.paths.root(Config.globalVueStyles)
-                    }
-                });
-
-                sassLoader.push({
+                rule.loaders.push({
                     loader: 'sass-resources-loader',
                     options: {
                         resources: Mix.paths.root(Config.globalVueStyles)
                     }
                 });
             }
-        }
+        };
 
-        let vueLoaderOptions = Object.assign(
-            {
-                loaders: Config.extractVueStyles
-                    ? {
-                          js: {
-                              loader: 'babel-loader',
-                              options: Config.babel()
-                          },
+        // SCSS
+        this.updateCssLoader('scss', webpackConfig, sassCallback);
 
-                          scss: scssLoader,
+        // SASS
+        this.updateCssLoader('sass', webpackConfig, sassCallback);
 
-                          sass: sassLoader,
-
-                          css: extractPlugin.extract({
-                              use: 'css-loader',
-                              fallback: 'vue-style-loader'
-                          }),
-
-                          stylus: extractPlugin.extract({
-                              use:
-                                  'css-loader!stylus-loader?paths[]=node_modules',
-                              fallback: 'vue-style-loader'
-                          }),
-
-                          less: extractPlugin.extract({
-                              use: 'css-loader!less-loader',
-                              fallback: 'vue-style-loader'
-                          })
-                      }
-                    : {
-                          js: {
-                              loader: 'babel-loader',
-                              options: Config.babel()
-                          }
-                      },
-                postcss: Config.postCss
-            },
-            Config.vue
-        );
-
-        return { vueLoaderOptions, extractPlugin };
+        // STYLUS
+        this.updateCssLoader('styl', webpackConfig);
     }
 
-    extractPlugin() {
-        if (typeof Config.extractVueStyles === 'string') {
-            return new ExtractTextPlugin(this.extractFilePath());
-        }
+    /**
+     * Update a single CSS loader.
+     *
+     * @param {string} loader
+     * @param {Object} webpackConfig
+     * @param {Function} callback
+     */
+    updateCssLoader(loader, webpackConfig, callback) {
+        let rule = webpackConfig.module.rules.find(rule => {
+            return rule.test instanceof RegExp && rule.test.test('.' + loader);
+        });
 
-        let preprocessorName = Object.keys(Mix.components.all())
-            .reverse()
-            .find(componentName => {
-                return ['sass', 'less', 'stylus', 'postCss'].includes(
-                    componentName
-                );
+        callback && callback(rule);
+
+        if (Config.extractVueStyles) {
+            let extractPlugin = this.extractPlugin();
+
+            rule.loaders = extractPlugin.extract({
+                fallback: 'style-loader',
+                use: collect(rule.loaders)
+                    .except('style-loader')
+                    .all()
             });
 
-        if (!preprocessorName) {
-            return new ExtractTextPlugin(this.extractFilePath());
+            this.addExtractPluginToConfig(extractPlugin, webpackConfig);
         }
-
-        return Mix.components.get(preprocessorName).extractPlugins.slice(-1)[0];
     }
 
-    extractFilePath() {
+    /**
+     * Fetch the appropriate postcss plugins for the compile.
+     */
+    postCssOptions() {
+        if (Mix.components.get('postCss')) {
+            return {
+                plugins: Mix.components.get('postCss').details[0].postCssPlugins
+            };
+        }
+
+        // If the user has a postcss.config.js file in their project root,
+        // postcss-loader will automatically read and fetch the plugins.
+        if (File.exists(Mix.paths.root('postcss.config.js'))) {
+            return {};
+        }
+
+        return { plugins: Config.postCss };
+    }
+
+    /**
+     * Add an extract text plugin to the webpack config plugins array.
+     *
+     * @param {Object} extractPlugin
+     * @param {Object} webpackConfig
+     */
+    addExtractPluginToConfig(extractPlugin, webpackConfig) {
+        if (extractPlugin.isNew) {
+            webpackConfig.plugins.push(extractPlugin);
+        }
+    }
+
+    /**
+     * Fetch the appropriate extract plugin.
+     */
+    extractPlugin() {
+        // If the user set extractVueStyles: true, we'll try
+        // to append the Vue styles to an existing CSS chunk.
+        if (typeof Config.extractVueStyles === 'boolean') {
+            let preprocessorName = Object.keys(Mix.components.all())
+                .reverse()
+                .find(componentName => {
+                    return ['sass', 'less', 'stylus', 'postCss'].includes(
+                        componentName
+                    );
+                });
+
+            if (preprocessorName) {
+                return Mix.components
+                    .get(preprocessorName)
+                    .extractPlugins.slice(-1)[0];
+            }
+        }
+
+        // Otherwise, we'll need to whip up a fresh extract text instance.
+        return collect(new ExtractTextPlugin(this.extractFileName()))
+            .put('isNew', true)
+            .all();
+    }
+
+    /**
+     * Determine the extract file name.
+     */
+    extractFileName() {
         let fileName =
             typeof Config.extractVueStyles === 'string'
                 ? Config.extractVueStyles
-                : 'vue-styles.css';
+                : '/css/vue-styles.css';
 
         return fileName.replace(Config.publicPath, '').replace(/^\//, '');
     }

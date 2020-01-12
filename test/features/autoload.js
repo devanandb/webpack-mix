@@ -1,8 +1,9 @@
 import mix from './helpers/setup';
 
-test.cb.serial('it handles library autoloading', t => {
+test.serial.cb('it handles library autoloading', t => {
     mix.autoload({
-        jquery: ['$', 'window.jQuery']
+        jquery: ['$', 'window.jQuery'],
+        'lodash.map': '_map'
     });
 
     compile(t, config => {
@@ -13,7 +14,8 @@ test.cb.serial('it handles library autoloading', t => {
         t.deepEqual(
             {
                 $: 'jquery',
-                'window.jQuery': 'jquery'
+                'window.jQuery': 'jquery',
+                _map: ['lodash', 'map']
             },
             providePlugin.definitions
         );

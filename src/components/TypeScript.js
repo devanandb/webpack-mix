@@ -1,6 +1,11 @@
 let JavaScript = require('./JavaScript');
 
 class TypeScript extends JavaScript {
+    constructor() {
+        super();
+        this.options = {};
+    }
+
     /**
      * The API name for the component.
      */
@@ -9,10 +14,22 @@ class TypeScript extends JavaScript {
     }
 
     /**
+     * Register the component.
+     *
+     * @param {*} entry
+     * @param {string} output
+     * @param {object} options
+     */
+    register(entry, output, options = {}) {
+        super.register(entry, output);
+        this.options = options;
+    }
+
+    /**
      * Required dependencies for the component.
      */
     dependencies() {
-        return ['ts-loader', 'typescript'].concat(super.dependencies());
+        return ['ts-loader', 'typescript'].concat();
     }
 
     /**
@@ -23,9 +40,11 @@ class TypeScript extends JavaScript {
             test: /\.tsx?$/,
             loader: 'ts-loader',
             exclude: /node_modules/,
-            options: {
-                appendTsSuffixTo: [/\.vue$/]
-            }
+            options: Object.assign(
+                {},
+                { appendTsSuffixTo: [/\.vue$/] },
+                this.options
+            )
         });
     }
 
@@ -35,6 +54,8 @@ class TypeScript extends JavaScript {
      * @param {Object} config
      */
     webpackConfig(config) {
+        super.webpackConfig(config);
+
         config.resolve.extensions.push('.ts', '.tsx');
         config.resolve.alias['vue$'] = 'vue/dist/vue.esm.js';
     }

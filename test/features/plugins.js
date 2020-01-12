@@ -1,5 +1,5 @@
 import test from 'ava';
-import mix from '../../src/index';
+import mix from './helpers/setup';
 import WebpackConfig from '../../src/builder/WebpackConfig';
 import sinon from 'sinon';
 import ComponentFactory from '../../src/components/ComponentFactory';
@@ -11,9 +11,13 @@ test('mix can be extended with new functionality as a callback', t => {
 
     mix.extend('foobar', registration);
 
-    mix.foobar();
+    mix.foobar('baz', 'buzz');
 
-    t.true(registration.called);
+    Mix.dispatch('init');
+
+    let config = new WebpackConfig().build();
+
+    t.true(registration.calledWith(config, 'baz', 'buzz'));
 });
 
 test('mix can be extended with new functionality as a class', t => {
@@ -30,9 +34,9 @@ test('mix can be extended with new functionality as a class', t => {
 });
 
 test('dependencies can be requested for download', t => {
-    let Verify = require('../../src/Verify');
+    let Assert = require('../../src/Assert');
 
-    Verify.dependency = sinon.spy();
+    Assert.dependencies = sinon.spy();
 
     mix.extend(
         'foobar',
@@ -49,7 +53,7 @@ test('dependencies can be requested for download', t => {
 
     Mix.dispatch('init');
 
-    t.true(Verify.dependency.calledWith('npm-package'));
+    t.true(Assert.dependencies.calledWith(['npm-package']));
 });
 
 test('webpack entry may be appended to', t => {
@@ -124,19 +128,25 @@ test('custom Babel config may be merged', t => {
     mix.extend(
         'reactNext',
         new class {
-            register() {}
-
             babelConfig() {
-                return { presets: ['react-next'] };
+                return {
+                    plugins: ['@babel/plugin-proposal-unicode-property-regex']
+                };
             }
         }()
     );
 
-    mix['reactNext']();
+    mix.reactNext();
 
-    Mix.dispatch('init');
+    buildConfig();
 
-    t.is('react-next', Config.babel().presets.pop());
+    t.true(
+        Config.babel().plugins.find(plugin =>
+            plugin.includes(
+                path.normalize('@babel/plugin-proposal-unicode-property-regex')
+            )
+        ) !== undefined
+    );
 });
 
 test('the fully constructed webpack config object is available for modification, if needed', t => {

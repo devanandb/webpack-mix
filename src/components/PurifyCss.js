@@ -14,22 +14,17 @@ class PurifyCss extends AutomaticComponent {
     }
 
     /**
-     * Boot the component.
+     * Override the generated webpack configuration.
+     *
+     * @param {Object} config
      */
-    boot() {
+    webpackConfig(config) {
         if (Config.purifyCss) {
             Config.purifyCss = this.build(Config.purifyCss);
-        }
-    }
 
-    /**
-     * webpack plugins to be appended to the master config.
-     */
-    webpackPlugins() {
-        if (Config.purifyCss) {
             let CssPurifierPlugin = require('../webpackPlugins/CssPurifierPlugin');
 
-            return CssPurifierPlugin.build();
+            config.plugins.push(CssPurifierPlugin.build());
         }
     }
 
@@ -39,16 +34,21 @@ class PurifyCss extends AutomaticComponent {
      * @param {Object} options
      */
     build(options) {
-        if (typeof options === 'object' && options.paths) {
-            let paths = options.paths;
+        if (typeof options === 'object') {
+            if (options.paths) {
+                let paths = options.paths;
 
-            paths.forEach(path => {
-                if (!path.includes('*')) return;
+                paths.forEach(path => {
+                    if (!path.includes('*')) return;
 
-                options.paths.splice(paths.indexOf(path), 1);
+                    options.paths.splice(paths.indexOf(path), 1);
 
-                options.paths = paths.concat(glob.sync(path));
-            });
+                    options.paths = paths.concat(glob.sync(path));
+                });
+            }
+            options.minimize = options.hasOwnProperty('minimize')
+                ? options.minimize
+                : Mix.inProduction();
         }
 
         return options;

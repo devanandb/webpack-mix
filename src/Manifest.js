@@ -1,6 +1,4 @@
-let objectValues = require('lodash').values;
-let without = require('lodash').without;
-
+let collect = require('collect.js');
 let path = require('path');
 
 class Manifest {
@@ -25,7 +23,9 @@ class Manifest {
             );
         }
 
-        return sortObjectKeys(this.manifest);
+        return collect(this.manifest)
+            .sortKeys()
+            .all();
     }
 
     /**
@@ -64,13 +64,7 @@ class Manifest {
      * @param {object} stats
      */
     transform(stats) {
-        let customAssets = Config.customAssets.map(asset =>
-            asset.pathFromPublic()
-        );
-
-        this.flattenAssets(stats)
-            .concat(customAssets)
-            .forEach(this.add.bind(this));
+        this.flattenAssets(stats).forEach(this.add.bind(this));
 
         return this;
     }
@@ -108,10 +102,14 @@ class Manifest {
 
         // If there's a temporary mix.js chunk, we can safely remove it.
         if (assets.mix) {
-            assets.mix = without(assets.mix, 'mix.js');
+            assets.mix = collect(assets.mix)
+                .except('mix.js')
+                .all();
         }
 
-        return flatten(assets);
+        return collect(assets)
+            .flatten()
+            .all();
     }
 
     /**

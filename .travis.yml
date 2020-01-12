@@ -2,16 +2,20 @@ language: node_js
 
 # Test linux and osx
 os:
-  - linux
-  - osx
+    - linux
+    - osx
 
 # Test against all supported versions of Node.js
 node_js:
-  - "6"
-  - "7"
-  - "8"
-  - "9"
+    - '8'
+    - '10'
+    - '12'
+    - '13'
+
+# Run ESLint after npm test
+script:
+    - npm run eslint
 
 cache:
-  directories:
-    - "node_modules"
+    directories:
+        - 'node_modules'

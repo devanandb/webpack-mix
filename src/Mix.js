@@ -2,7 +2,6 @@ let Paths = require('./Paths');
 let Manifest = require('./Manifest');
 let Dispatcher = require('./Dispatcher');
 let Components = require('./components/Components');
-let isFunction = require('lodash').isFunction;
 
 class Mix {
     /**
@@ -63,21 +62,27 @@ class Mix {
     }
 
     /**
+     * Determine if the given npm package is installed.
+     *
+     * @param {string} npmPackage
+     */
+    seesNpmPackage(npmPackage) {
+        try {
+            require.resolve(npmPackage);
+
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
      * Determine if Mix should activate hot reloading.
      */
     shouldHotReload() {
         new File(path.join(Config.publicPath, 'hot')).delete();
 
         return this.isUsing('hmr');
-    }
-
-    /**
-     * Add a custom file to the webpack assets collection.
-     *
-     * @param {string} asset
-     */
-    addAsset(asset) {
-        Config.customAssets.push(asset);
     }
 
     /**
@@ -106,7 +111,7 @@ class Mix {
      * @param {*}      data
      */
     dispatch(event, data) {
-        if (isFunction(data)) {
+        if (typeof data === 'function') {
             data = data();
         }
 

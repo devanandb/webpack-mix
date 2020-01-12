@@ -16,6 +16,25 @@ test.serial('mix.react()', t => {
     );
 });
 
+test.serial.cb('it compiles React and a preprocessor properly', t => {
+    mix.react('test/fixtures/fake-app/resources/assets/js/app.js', 'js').sass(
+        'test/fixtures/fake-app/resources/assets/sass/app.scss',
+        'css'
+    );
+
+    compile(t, config => {
+        assertManifestIs(
+            {
+                '/css/app.css': '/css/app.css',
+                '/js/app.js': '/js/app.js'
+            },
+            t
+        );
+
+        t.true(File.exists('test/fixtures/fake-app/public/js/app.js'));
+    });
+});
+
 test.serial('it sets the webpack entry correctly', t => {
     mix.react('resources/assets/js/app.js', 'js');
 
@@ -32,5 +51,9 @@ test.serial('it sets the babel config correctly', t => {
 
     buildConfig();
 
-    t.true(Config.babel().presets.includes('react'));
+    t.true(
+        Config.babel().presets.find(p =>
+            p.includes(path.normalize('@babel/preset-react'))
+        ) !== undefined
+    );
 });

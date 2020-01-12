@@ -1,20 +1,29 @@
-# Quick Webpack Configuration
+# Quick webpack Configuration
 
 ```js
- mix.webpackConfig({});
+mix.webpackConfig({} || cb);
 ```
 
-While, of course, you're free to edit the provided `webpack.config.js` file, in certain settings, it's easier to modify or override the default settings directly from your `webpack.mix.js` file. 
+In some cases, it may prove easier to override the underlying webpack configuration directly.
 
-As an example, perhaps you want to add a custom array of modules that should be automatically loaded by webpack. You have two options in this scenario:
+As an example, perhaps you want to add a custom array of modules that should be automatically loaded by webpack. We'll use Laravel Spark as an example.
 
-1. Edit your `webpack.config.js` file, as needed.
-2. Call `mix.webpackConfig()` within your `webpack.mix.js` file, and pass your overrides. Mix will then perform a deep merge.
+```js
+mix.webpackConfig({
+    resolve: {
+        modules: [
+            'node_modules',
+            path.resolve(__dirname, 'vendor/laravel/spark/resources/assets/js')
+        ]
+    }
+});
+```
 
+The object passed to the `webpackConfig()` method will now be merged with Mix's generated config object.
 
 ## Using a Callback Function
 
-You can access webpack and all of its properties when passing a callback function.
+You may alternatively access webpack and all of its properties by passing a callback function.
 
 ```js
 mix.webpackConfig(webpack => {
@@ -22,12 +31,10 @@ mix.webpackConfig(webpack => {
         plugins: [
             new webpack.ProvidePlugin({
                 $: 'jquery',
-                jQuery: 'jquery', 
-                'window.jQuery': 'jquery',
+                jQuery: 'jquery',
+                'window.jQuery': 'jquery'
             })
         ]
     };
 });
 ```
-
-

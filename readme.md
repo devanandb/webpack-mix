@@ -1,5 +1,6 @@
-<img align="left" width="220" src="https://webpack.js.org/6bc5d8cf78d442a984e70195db059b69.svg" alt="Webpack Mix">
+<img align="left" width="220" src="https://raw.githubusercontent.com/webpack/media/master/logo/icon.png" alt="Webpack Mix">
 <br>
+<br/>
 <h1 align="left">Webpack Mix</h1>
 <p align="left">
 <a href="https://www.npmjs.com/package/webpack-mix"><img src="https://img.shields.io/npm/v/webpack-mix.svg" alt="NPM"></a>

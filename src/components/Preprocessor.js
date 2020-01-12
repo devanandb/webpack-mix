@@ -1,4 +1,4 @@
-let Verify = require('../Verify');
+let Assert = require('../Assert');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 class Preprocessor {
@@ -9,8 +9,6 @@ class Preprocessor {
      */
     webpackEntry(entry) {
         this.details.forEach(detail => {
-            if (detail.type === 'fastsass') return;
-
             entry.add(entry.keys()[0], detail.src.path());
         });
     }
@@ -21,9 +19,7 @@ class Preprocessor {
     webpackRules() {
         let rules = [];
 
-        this.details.forEach(preprocessor => {
-            if (preprocessor.type === 'fastsass') return;
-
+        this.details.forEach((preprocessor, index) => {
             let outputPath = preprocessor.output.filePath
                 .replace(Config.publicPath + path.sep, path.sep)
                 .replace(/\\/g, '/');
@@ -47,7 +43,7 @@ class Preprocessor {
                                 Config.processCssUrls
                                     ? true
                                     : Mix.isUsing('sourcemaps'),
-                            ident: 'postcss',
+                            ident: `postcss${index}`,
                             plugins: (function() {
                                 let plugins = Config.postCss;
 
@@ -80,7 +76,7 @@ class Preprocessor {
                         loader: 'resolve-url-loader',
                         options: {
                             sourceMap: true,
-                            root: Mix.paths.root('node_modules')
+                            engine: 'rework'
                         }
                     });
                 }
@@ -88,22 +84,23 @@ class Preprocessor {
                 if (preprocessor.type !== 'postCss') {
                     loaders.push({
                         loader: `${preprocessor.type}-loader`,
-                        options: Object.assign(preprocessor.pluginOptions, {
-                            sourceMap:
-                                preprocessor.type === 'sass' &&
-                                Config.processCssUrls
-                                    ? true
-                                    : Mix.isUsing('sourcemaps')
-                        })
+                        options: this.loaderOptions(preprocessor)
                     });
                 }
 
+                const applyLoaders = (hmr, loaders) => {
+                    loaders = extractPlugin.extract({
+                        fallback: 'style-loader',
+                        use: loaders,
+                        remove: !hmr
+                    });
+
+                    return hmr ? ['style-loader', ...loaders] : loaders;
+                };
+
                 rules.push({
                     test: preprocessor.src.path(),
-                    use: extractPlugin.extract({
-                        fallback: 'style-loader',
-                        use: loaders
-                    })
+                    use: applyLoaders(Mix.isUsing('hmr'), loaders)
                 });
 
                 this.extractPlugins = (this.extractPlugins || []).concat(
@@ -123,15 +120,36 @@ class Preprocessor {
     }
 
     /**
+     * Prepare the preprocessor plugin options.
+     *
+     * @param {Object} preprocessor
+     */
+    loaderOptions(preprocessor) {
+        tap(preprocessor.pluginOptions.implementation, implementation => {
+            if (typeof implementation === 'function') {
+                preprocessor.pluginOptions.implementation = implementation();
+            }
+        });
+
+        return Object.assign(preprocessor.pluginOptions, {
+            sourceMap:
+                preprocessor.type === 'sass' && Config.processCssUrls
+                    ? true
+                    : Mix.isUsing('sourcemaps')
+        });
+    }
+
+    /**
      * Register a generic CSS preprocessor.
      *
      * @param {string} type
      * @param {string} src
      * @param {string} output
      * @param {object} pluginOptions
+     * @param {Array} postCssPlugins
      */
-    preprocess(type, src, output, pluginOptions = {}) {
-        Verify.preprocessor(type, src, output);
+    preprocess(type, src, output, pluginOptions = {}, postCssPlugins = []) {
+        Assert.preprocessor(type, src, output);
 
         src = new File(src);
 
@@ -144,12 +162,9 @@ class Preprocessor {
             type: this.constructor.name.toLowerCase(),
             src,
             output,
-            pluginOptions
+            pluginOptions,
+            postCssPlugins
         });
-
-        if (type === 'fastSass') {
-            Mix.addAsset(output);
-        }
 
         return this;
     }

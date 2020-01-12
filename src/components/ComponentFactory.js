@@ -1,20 +1,19 @@
 let mix = require('../index');
-let Verify = require('../Verify');
+let Assert = require('../Assert');
 let webpackMerge = require('webpack-merge');
 
 let components = [
     'JavaScript',
-    'FastSass',
+    'Preact',
+    'React',
+    'Coffee',
+    'TypeScript',
     'Less',
     'Sass',
     'Stylus',
     'PostCss',
     'Css',
     'Browsersync',
-    'Preact',
-    'React',
-    'Coffee',
-    'TypeScript',
     'Combine',
     'Copy',
     'Autoload',
@@ -23,7 +22,8 @@ let components = [
     'Extract',
     'Notifications',
     'DisableNotifications',
-    'PurifyCss'
+    'PurifyCss',
+    'DumpWebpackConfig'
 ];
 
 class ComponentFactory {
@@ -52,8 +52,8 @@ class ComponentFactory {
                 return;
             }
 
-            component.boot && component.boot();
             component.dependencies && this.installDependencies(component);
+            component.boot && component.boot();
             component.babelConfig && this.applyBabelConfig(component);
 
             Mix.listen('loading-entry', entry => {
@@ -127,9 +127,9 @@ class ComponentFactory {
         []
             .concat(component.dependencies())
             .filter(dependency => dependency)
-            .forEach(dependency =>
-                Verify.dependency(dependency, !!component.requiresReload)
-            );
+            .tap(dependencies => {
+                Assert.dependencies(dependencies, component.requiresReload);
+            });
     }
 
     /**

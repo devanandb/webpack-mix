@@ -12,7 +12,7 @@ class Browsersync {
     dependencies() {
         this.requiresReload = true;
 
-        return ['browser-sync-webpack-plugin', 'browser-sync'];
+        return ['browser-sync', 'browser-sync-webpack-plugin@2.0.1'];
     }
 
     /**
@@ -35,6 +35,14 @@ class Browsersync {
     }
 
     /**
+     * The regex used to determine where the Browsersync
+     * javascript snippet is injected onto each page.
+     */
+    regex() {
+        return RegExp('(</body>|</pre>)(?!.*(</body>|</pre>))', 'is');
+    }
+
+    /**
      * Build the BrowserSync configuration.
      */
     config() {
@@ -46,12 +54,11 @@ class Browsersync {
                 files: [
                     'app/**/*.php',
                     'resources/views/**/*.php',
-                    'public/js/**/*.js',
-                    'public/css/**/*.css'
+                    `${Config.publicPath || 'public'}/**/*.(js|css)`
                 ],
                 snippetOptions: {
                     rule: {
-                        match: /(<\/body>|<\/pre>)/i,
+                        match: this.regex(),
                         fn: function(snippet, match) {
                             return snippet + match;
                         }

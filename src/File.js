@@ -1,7 +1,8 @@
+let os = require('os');
 let md5 = require('md5');
 let path = require('path');
 let fs = require('fs-extra');
-let uglify = require('uglify-js');
+let Terser = require('terser');
 let UglifyCss = require('clean-css');
 
 class File {
@@ -151,6 +152,8 @@ class File {
             body = JSON.stringify(body, null, 4);
         }
 
+        body = body + os.EOL;
+
         fs.writeFileSync(this.absolutePath, body);
 
         return this;
@@ -160,9 +163,7 @@ class File {
      * Read the file's contents.
      */
     read() {
-        return fs.readFileSync(this.path(), {
-            encoding: 'utf-8'
-        });
+        return fs.readFileSync(this.path(), 'utf8');
     }
 
     /**
@@ -197,7 +198,9 @@ class File {
      */
     minify() {
         if (this.extension() === '.js') {
-            this.write(uglify.minify(this.path(), Config.uglify).code);
+            this.write(
+                Terser.minify(this.read(), Config.terser.terserOptions).code
+            );
         }
 
         if (this.extension() === '.css') {

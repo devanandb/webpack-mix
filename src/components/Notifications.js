@@ -11,8 +11,12 @@ class Notifications extends AutomaticComponent {
             return new WebpackNotifierPlugin({
                 title: 'Webpack Mix',
                 alwaysNotify: Config.notifications.onSuccess,
+                hint:
+                    process.platform === 'linux'
+                        ? 'int:transient:1'
+                        : undefined,
                 contentImage: Mix.paths.root(
-                    'node_modules/webpack-mix/icons/webpack.png'
+                    'node_modules/webpack-mix/icons/webpack-mix.png'
                 )
             });
         }

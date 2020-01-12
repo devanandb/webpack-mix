@@ -1,6 +1,6 @@
 import mix from './helpers/setup';
 
-test.cb.serial('it combines a folder of scripts', t => {
+test.serial.cb('it combines a folder of scripts', t => {
     let output = 'test/fixtures/fake-app/public/all.js';
 
     mix.scripts('test/fixtures/fake-app/resources/assets/js', output);
@@ -15,10 +15,10 @@ test.cb.serial('it combines a folder of scripts', t => {
     });
 });
 
-test.cb.serial('it can minify a file', t => {
-    mix
-        .js('test/fixtures/fake-app/resources/assets/js/app.js', 'js')
-        .minify('test/fixtures/fake-app/public/js/app.js');
+test.serial.cb('it can minify a file', t => {
+    mix.js('test/fixtures/fake-app/resources/assets/js/app.js', 'js').minify(
+        'test/fixtures/fake-app/public/js/app.js'
+    );
 
     compile(t, () => {
         t.true(File.exists('test/fixtures/fake-app/public/js/app.min.js'));
@@ -33,9 +33,8 @@ test.cb.serial('it can minify a file', t => {
     });
 });
 
-test.cb.serial('it compiles JS and then combines the bundles files.', t => {
-    mix
-        .js('test/fixtures/fake-app/resources/assets/js/app.js', 'js')
+test.serial.cb('it compiles JS and then combines the bundles files.', t => {
+    mix.js('test/fixtures/fake-app/resources/assets/js/app.js', 'js')
         .js('test/fixtures/fake-app/resources/assets/js/another.js', 'js')
         .scripts(
             [

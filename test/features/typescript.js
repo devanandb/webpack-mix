@@ -19,7 +19,7 @@ test.serial('mix.ts()', t => {
     t.is(mix, mix.typeScript('resources/assets/js/app.ts', 'public/js'));
 });
 
-test.cb.serial(
+test.serial.cb(
     'it applies the correct extensions and aliases to the webpack config',
     t => {
         mix.ts(
@@ -43,5 +43,14 @@ test.serial('it applies the correct webpack rules', t => {
         buildConfig().module.rules.find(
             rule => rule.test.toString() === '/\\.tsx?$/'
         )
+    );
+});
+
+test.serial('it is able to apply options to ts-loader', t => {
+    mix.ts('resources/assets/js/app.js', 'public/js', { transpileOnly: true });
+
+    t.truthy(
+        buildConfig().module.rules.find(rule => rule.loader === 'ts-loader')
+            .options.transpileOnly
     );
 });

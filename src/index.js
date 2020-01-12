@@ -27,25 +27,21 @@ global.File = require('./File');
 global.Config = require('./config')();
 global.Mix = new (require('./Mix'))();
 
-
-
 /**
  * If the user activates hot reloading, with the --hot
- * flag, we'll record it as a file, so that we
+ * flag, we'll record it as a file, so that app
  * can detect it and update its mix() url paths.
  */
 
 Mix.listen('init', () => {
     if (Mix.shouldHotReload()) {
         let http = process.argv.includes('--https') ? 'https' : 'http';
+        let port = process.argv.includes('--port')
+            ? process.argv[process.argv.indexOf('--port') + 1]
+            : Config.hmrOptions.port;
 
         new File(path.join(Config.publicPath, 'hot')).write(
-            http +
-                '://' +
-                Config.hmrOptions.host +
-                ':' +
-                Config.hmrOptions.port +
-                '/'
+            http + '://' + Config.hmrOptions.host + ':' + port + '/'
         );
     }
 });
@@ -60,5 +56,4 @@ let Api = require('./Api');
 let api = new Api();
 
 module.exports = api;
-module.exports.mix = api; // Deprecated.
 module.exports.config = Config;

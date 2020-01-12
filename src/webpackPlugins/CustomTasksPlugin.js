@@ -1,3 +1,6 @@
+let Log = require('../Log');
+let collect = require('collect.js');
+
 class CustomTasksPlugin {
     /**
      * Apply the plugin.
@@ -47,33 +50,32 @@ class CustomTasksPlugin {
      * Minify the given asset file.
      */
     minifyAssets() {
-        let tasks = Mix.tasks.filter(
-            task => task.constructor.name !== 'VersionFilesTask'
-        );
+        collect(Mix.tasks)
+            .where('constructor.name', '!==', 'VersionFilesTask')
+            .where('constructor.name', '!==', 'CopyFilesTask')
+            .each(({ assets }) =>
+                assets.forEach(asset => {
+                    try {
+                        asset.minify();
+                    } catch (e) {
+                        Log.error(
+                            `Whoops! We had trouble minifying "${asset.relativePath()}". ` +
+                                `Perhaps you need to use mix.babel() instead?`
+                        );
 
-        tasks.forEach(task => {
-            task.assets.forEach(asset => {
-                try {
-                    asset.minify();
-                } catch (e) {
-                    console.log(
-                        `Whoops! We had trouble minifying "${asset.relativePath()}". ` +
-                            `Perhaps you need to use mix.babel() instead?`
-                    );
-
-                    throw e;
-                }
-            });
-        });
+                        throw e;
+                    }
+                })
+            );
     }
 
     /**
      * Version all files that are present in the manifest.
      */
     applyVersioning() {
-        let manifest = Object.keys(Mix.manifest.get());
-
-        manifest.forEach(file => Mix.manifest.hash(file));
+        collect(Mix.manifest.get()).each((value, key) =>
+            Mix.manifest.hash(key)
+        );
     }
 }
 

@@ -1,6 +1,6 @@
 import mix from './helpers/setup';
 
-test.cb.serial('it compiles JavaScript', t => {
+test.serial.cb('it compiles JavaScript', t => {
     mix.js('test/fixtures/fake-app/resources/assets/js/app.js', 'js');
 
     compile(t, () => {
@@ -15,10 +15,26 @@ test.cb.serial('it compiles JavaScript', t => {
     });
 });
 
-test.cb.serial('it compiles JavaScript and Sass', t => {
-    mix
-        .js('test/fixtures/fake-app/resources/assets/js/app.js', 'js')
-        .sass('test/fixtures/fake-app/resources/assets/sass/app.scss', 'css');
+test.serial.cb('it compiles JavaScript with dynamic import', t => {
+    mix.js('test/fixtures/fake-app/resources/assets/dynamic/dynamic.js', 'js');
+
+    compile(t, () => {
+        t.true(File.exists('test/fixtures/fake-app/public/js/dynamic.js'));
+
+        t.deepEqual(
+            {
+                '/js/dynamic.js': '/js/dynamic.js'
+            },
+            readManifest()
+        );
+    });
+});
+
+test.serial.cb('it compiles JavaScript and Sass', t => {
+    mix.js('test/fixtures/fake-app/resources/assets/js/app.js', 'js').sass(
+        'test/fixtures/fake-app/resources/assets/sass/app.scss',
+        'css'
+    );
 
     compile(t, () => {
         t.true(File.exists('test/fixtures/fake-app/public/js/app.js'));
@@ -51,7 +67,7 @@ test.serial('basic JS compilation config.', t => {
             path: path.resolve('test/fixtures/fake-app/public'),
             filename: '[name].js',
             chunkFilename: '[name].js',
-            publicPath: ''
+            publicPath: '/'
         },
         webpackConfig.output
     );
@@ -72,16 +88,16 @@ test.serial(
 );
 
 test.serial('basic JS compilation with a different public path', t => {
-    mix
-        .js('resources/assets/js/app.js', 'public/js')
-        .setPublicPath('public-html');
+    mix.js('resources/assets/js/app.js', 'public/js').setPublicPath(
+        'public-html'
+    );
 
     t.deepEqual(
         {
             path: path.resolve('public-html'),
             filename: '[name].js',
             chunkFilename: '[name].js',
-            publicPath: ''
+            publicPath: '/'
         },
         buildConfig().output
     );

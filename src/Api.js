@@ -1,4 +1,3 @@
-let Verify = require('./Verify');
 let webpack = require('webpack');
 let path = require('path');
 
@@ -6,12 +5,19 @@ class Api {
     /**
      * Enable sourcemap support.
      *
-     * @param {Boolean} productionToo
-     * @param {string}  type
+     * @param {Boolean} generateForProduction
+     * @param {string}  devType
+     * @param {string}  productionType
      */
-    sourceMaps(productionToo = true, type = 'eval-source-map') {
+    sourceMaps(
+        generateForProduction = true,
+        devType = 'eval-source-map',
+        productionType = 'source-map'
+    ) {
+        let type = devType;
+
         if (Mix.inProduction()) {
-            type = productionToo ? 'source-map' : false;
+            type = generateForProduction ? productionType : false;
         }
 
         Config.sourcemaps = type;
@@ -85,6 +91,18 @@ class Api {
      */
     then(callback) {
         Mix.listen('build', callback);
+
+        return this;
+    }
+
+    /**
+     * Register an event listen for when the webpack
+     * config object has been fully generated.
+     *
+     * @param {Function} callback
+     */
+    override(callback) {
+        Mix.listen('configReadyForUser', callback);
 
         return this;
     }

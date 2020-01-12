@@ -5,7 +5,7 @@ class Stylus extends Preprocessor {
      * Required dependencies for the component.
      */
     dependencies() {
-        return ['stylus-loader', 'stylus'];
+        return ['stylus', 'stylus-loader'];
     }
 
     /**
@@ -14,9 +14,23 @@ class Stylus extends Preprocessor {
      * @param {*} src
      * @param {string} output
      * @param {Object} pluginOptions
+     * @param {Array}  postCssPlugins
      */
-    register(src, output, pluginOptions = {}) {
-        return this.preprocess('stylus', src, output, pluginOptions);
+    register(src, output, pluginOptions = {}, postCssPlugins = []) {
+        pluginOptions = Object.assign(
+            {
+                preferPathResolver: 'webpack'
+            },
+            pluginOptions
+        );
+
+        return this.preprocess(
+            'stylus',
+            src,
+            output,
+            pluginOptions,
+            postCssPlugins
+        );
     }
 }
 

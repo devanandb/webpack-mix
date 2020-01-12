@@ -1,6 +1,6 @@
 {
     "name": "webpack-mix",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "description": "Webpack is an elegant wrapper around Webpack for more than 80% of use cases.",
     "main": "src/index.js",
     "scripts": {
@@ -36,7 +36,7 @@
         "src"
     ],
     "publishConfig": {
-        "registry": "https://npm.pkg.github.com/"
+        "registry": "https://npm.pkg.github.com/devanandb"
     },
     "dependencies": {
         "@babel/core": "^7.2.0",

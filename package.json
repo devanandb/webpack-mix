@@ -1,5 +1,5 @@
 {
-    "name": "webpack-mix",
+    "name": "@devanandb/webpack-mix",
     "version": "3.0.1",
     "description": "Webpack is an elegant wrapper around Webpack for more than 80% of use cases.",
     "main": "src/index.js",
